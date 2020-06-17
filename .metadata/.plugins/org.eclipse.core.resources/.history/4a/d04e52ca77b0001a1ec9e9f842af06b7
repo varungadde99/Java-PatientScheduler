@@ -1,0 +1,208 @@
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.PriorityQueue;
+import java.util.Scanner;
+
+public class Hospital {
+
+	public static void displaySchedule(PriorityQueue<Patient> pq) {
+		System.out.println("patients in" + pq + "PriorityQueue");
+		while (!pq.isEmpty()) {
+			pq.poll().showLessDetails();
+		}
+		System.out.println("-----------END----------");
+	}
+
+	public static void main(String[] args) {
+
+		Scanner sc = new Scanner(System.in);
+
+		HashMap<String, Integer> Ortho1 = new HashMap<>();
+		Ortho1.put("Operation", 60);
+		Ortho1.put("Fracture", 50);
+		Ortho1.put("Ligament Tear", 40);
+		Ortho1.put("Sprain", 30);
+		Ortho1.put("Swelling", 20);
+		Ortho1.put("Pain", 10);
+
+		HashMap<String, Integer> Cardio2 = new HashMap<>();
+		Cardio2.put("C1", 10);
+		Cardio2.put("C2", 20);
+		Cardio2.put("C3", 30);
+
+		HashMap<String, Integer> COVID3 = new HashMap<>();
+		COVID3.put("SARS", 20);
+		COVID3.put("MERS", 10);
+
+		PriorityQueue<Patient> Ortho = new PriorityQueue<Patient>(new PatientComparator());
+		PriorityQueue<Patient> Cardio = new PriorityQueue<Patient>(new PatientComparator());
+		PriorityQueue<Patient> Covid = new PriorityQueue<Patient>(new CovidPatientComparator());
+
+		Patient patientArr[] = new Patient[100];
+		int patientCount = 0;
+
+		int flag = 0;
+
+		while (flag == 0) {
+
+			System.out.println("-----------------Menu-------------------");
+			System.out.println("1.Add Patient");
+			System.out.println("2.Check Patient Queue");
+			System.out.println("3.Exit");
+
+			int menu = sc.nextInt();
+
+			switch (menu) {
+
+			case 1: {
+				patientArr[patientCount] = new Patient();
+				patientArr[patientCount].getDetails();
+
+				System.out.println("Enter Integer\n1.Ortho \n2.Cardio \n3.COVID19");
+				int choice = sc.nextInt();
+				sc.nextLine();
+				switch (choice) {
+
+				case 1:
+					System.out.println(
+							"Enter String\n1. Operation \n2. Fracture \n3. Ligament Tear \n4. Sprain \n5. Swelling \n6. Pain");
+					patientArr[patientCount].disease = sc.nextLine();
+					patientArr[patientCount].priority = Ortho1.get(patientArr[patientCount].disease);
+					Ortho.add(patientArr[patientCount]);
+					patientArr[patientCount].showDetails();
+					break;
+
+				case 2:
+					System.out.println("Enter String\n1. C1 \n2. C2 \n3. C3");
+					patientArr[patientCount].disease = sc.nextLine();
+					patientArr[patientCount].priority = Cardio2.get(patientArr[patientCount].disease);
+					Cardio.add(patientArr[patientCount]);
+					patientArr[patientCount].showDetails();
+					break;
+
+				case 3:
+					System.out.println("Enter String\n1. SARS \n2. MERS");
+					patientArr[patientCount].disease = sc.nextLine();
+					patientArr[patientCount].priority = COVID3.get(patientArr[patientCount].disease);
+					Covid.add(patientArr[patientCount]);
+					patientArr[patientCount].showDetails();
+					break;
+
+				default:
+					break;
+				}
+			}
+				break;
+
+			case 2: {
+				System.out.println("1.Display Ortho \n2.Display Cardio \n3.Display Fever");
+				int diseasechoice = sc.nextInt();
+				sc.nextLine();
+
+				switch (diseasechoice) {
+
+				case 1:
+					displaySchedule(Ortho);
+					break;
+
+				case 2:
+					displaySchedule(Cardio);
+					break;
+
+				case 3:
+					displaySchedule(Covid);
+					break;
+
+				default:
+					break;
+				}
+			}
+				break;
+
+			case 3:
+				flag = 1;
+				break;
+
+			default:
+				break;
+			}
+
+		}
+
+		sc.close();
+	}
+
+}
+
+class PatientComparator implements Comparator<Patient> {
+	public int compare(Patient s1, Patient s2) {
+		if (s1.priority < s2.priority)
+			return 1;
+		else if (s1.priority > s2.priority)
+			return -1;
+		return 0;
+	}
+}
+
+class CovidPatientComparator implements Comparator<Patient> {
+	public int compare(Patient s1, Patient s2) {
+		if (s1.age < s2.age)
+			return 1;
+		else if (s1.age > s2.age)
+			return -1;
+		return 0;
+	}
+}
+
+class Patient {
+
+	public String name;
+	public int age;
+	public int priority = 0;
+	static int id = 100;
+	String disease;
+
+	public void getDetails() {
+		Scanner sc = new Scanner(System.in);
+
+		System.out.println("Enter Patient name");
+		String pname = sc.nextLine();
+		this.name = pname;
+
+		System.out.println("Enter Patient age");
+		int page = sc.nextInt();
+		this.age = page;
+		sc.close();
+	}
+
+	public void showDetails() {
+
+		System.out.println("--------------------");
+		System.out.println(" PATIENT DETAILS ");
+		System.out.println("--------------------");
+		System.out.println("Patient id: " + id);
+		System.out.println();
+		System.out.println("Name: " + this.name);
+		System.out.println();
+		System.out.println("Age: " + this.age);
+		System.out.println();
+		System.out.println("Disease: " + this.disease);
+		System.out.println();
+		System.out.println("Severity: " + this.priority);
+		System.out.println("--------------------");
+		System.out.println("--------------------");
+		id++;
+	}
+
+	public void showLessDetails() {
+		System.out.println("Name: " + this.name);
+		System.out.println("Disease: " + this.disease);
+		System.out.println("Severity :" + this.priority);
+		System.out.println("---------------------------");
+
+	}
+
+	public String getName() {
+		return name;
+	}
+}
