@@ -2,6 +2,16 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Scanner;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.PreparedStatement;
+import com.mysql.jdbc.ResultSet;
+import com.mysql.jdbc.ResultSetMetaData;
+import com.mysql.jdbc.Statement;
+import com.mysql.jdbc.ResultSetMetaData;
+import java.time.*;
+
 
 public class Hospital {
 
@@ -13,7 +23,22 @@ public class Hospital {
 		System.out.println("-----------END----------");
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+		
+		
+		LocalDate todayDate = LocalDate.now();
+		// Identify and establish the driver.
+		Class.forName("com.mysql.jdbc.Driver");
+
+		// Create a connection to our required database. Here pfs is database.
+		java.sql.Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hospital", "root", "gvarun99");
+
+		System.out.println("Connected");
+		
+		Statement stmt1=(Statement) con.createStatement();
+		ResultSet rs2=(ResultSet) stmt1.executeQuery("TRUNCATE table hospital");//For query execution
+				
+		
 
 		Scanner sc = new Scanner(System.in);
 
@@ -73,16 +98,32 @@ public class Hospital {
 					patientArr[patientCount].priority = Ortho1.get(patientArr[patientCount].disease);
 					Ortho.add(patientArr[patientCount]);
 					patientArr[patientCount].showDetails();
+					
+					PreparedStatement pstmt1 = (PreparedStatement) con.prepareStatement("insert into hospital values(?,?,?,?)");
+
+					pstmt1.setInt(1,patientArr[patientCount].id);
+					pstmt1.setString(2,patientArr[patientCount].name);
+					pstmt1.setInt(3,patientArr[patientCount].age);
+					pstmt1.setString(4,patientArr[patientCount].disease);
+					pstmt1.executeUpdate();  
 					break;
 
 				case 2:// Dental
 					patientArr[patientCount].getDetails();
 					System.out.println(
-							"Enter String\n1. Root Canal (RT) \n2. Cavitiy Treatment (CT) \n3. Braces (BR) \n4. General Checkup (GC)");
+							"Enter String\n1. Root Canal (RC) \n2. Cavitiy Treatment (CT) \n3. Braces (BR) \n4. General Checkup (GC)");
 					patientArr[patientCount].disease = sc.nextLine();
 					patientArr[patientCount].priority = Dental2.get(patientArr[patientCount].disease);
 					Dental.add(patientArr[patientCount]);
 					patientArr[patientCount].showDetails();
+					
+					PreparedStatement pstmt2 = (PreparedStatement) con.prepareStatement("insert into hospital values(?,?,?,?)");
+
+					pstmt2.setInt(1,patientArr[patientCount].id);
+					pstmt2.setString(2,patientArr[patientCount].name);
+					pstmt2.setInt(3,patientArr[patientCount].age);
+					pstmt2.setString(4,patientArr[patientCount].disease);
+					pstmt2.executeUpdate();  
 					break;
 
 				case 3:// Covid Test
@@ -94,33 +135,39 @@ public class Hospital {
 
 					if (ns1.equalsIgnoreCase("Y"))
 						m++; // Breath - MERS
-					System.out.println(s + " " + m);
+					
 
 					System.out.println("\n1.Do you have muscle pain:(Y/N)?");
 					ns1 = sc.nextLine();
 					if (ns1.equalsIgnoreCase("Y"))
 						s++; // Muscle - SERS
-					System.out.println(s + " " + m);
+					
 
 					System.out.println("\n1.Do you have chest pain:(Y/N)?");
 					ns1 = sc.nextLine();
 					if (ns1.equalsIgnoreCase("Y"))
 						m++; // Chest - MERS
-					System.out.println(s + " " + m);
+					
 
 					System.out.println("\n1.Do you have headache:(Y/N)?");
 					ns1 = sc.nextLine();
 					if (ns1.equalsIgnoreCase("Y"))
 						s++; // Headache - SERS
-					System.out.println(s + " " + m);
+					
 
 					System.out.println("\n1.Are you suffering from Diarrhoea:(Y/N)?");
 					ns1 = sc.nextLine();
 					if (ns1.equalsIgnoreCase("Y"))
 						m++; // Diarrhea - MERS
-					System.out.println(s + " " + m);
-
-					if (s >= m) {
+					
+					
+					if(s==0 && m==0)
+					{
+						System.out.println("Congratulations! You are a tested NEGATIVE for COVID.");
+						patientCount--;
+						break;
+					}
+					else if (s >= m) {
 						patientArr[patientCount].disease = "SARS";
 						patientArr[patientCount].priority = COVID3.get(patientArr[patientCount].disease);
 					} else {
@@ -130,6 +177,14 @@ public class Hospital {
 
 					Covid.add(patientArr[patientCount]);
 					patientArr[patientCount].showDetails();
+					
+					PreparedStatement pstmt3 = (PreparedStatement) con.prepareStatement("insert into hospital values(?,?,?,?)");
+
+					pstmt3.setInt(1,patientArr[patientCount].id);
+					pstmt3.setString(2,patientArr[patientCount].name);
+					pstmt3.setInt(3,patientArr[patientCount].age);
+					pstmt3.setString(4,patientArr[patientCount].disease);
+					pstmt3.executeUpdate();  
 					break;
 
 				case 4:
@@ -137,6 +192,14 @@ public class Hospital {
 					Idk.add(patientArr[patientCount]);
 					System.out.println("You are successfully enrolled in General Ward.");
 					patientArr[patientCount].showIdkDetails();
+					
+					PreparedStatement pstmt4 = (PreparedStatement) con.prepareStatement("insert into hospital values(?,?,?,?)");
+
+					pstmt4.setInt(1,patientArr[patientCount].id);
+					pstmt4.setString(2,patientArr[patientCount].name);
+					pstmt4.setInt(3,patientArr[patientCount].age);
+					pstmt4.setString(4,patientArr[patientCount].disease);
+					pstmt4.executeUpdate();  
 					break;
 
 				default:
@@ -146,7 +209,7 @@ public class Hospital {
 				break;
 
 			case 2: {
-				System.out.println("1.Display Ortho \n2.Display Cardio \n3.Display COVID \n4.Display General Ward");
+				System.out.println("1.Display Ortho \n2.Display Cardio \n3.Display COVID \n4.Display General Ward \n5.Display Global Patient List "+todayDate);
 				int diseasechoice = sc.nextInt();
 				sc.nextLine();
 
@@ -166,6 +229,21 @@ public class Hospital {
 
 				case 4:
 					displaySchedule(Idk);
+					break;
+					
+				case 5: 
+					Statement stmt=(Statement) con.createStatement();
+					ResultSet rs=(ResultSet) stmt.executeQuery("select * from hospital");
+					ResultSetMetaData rs1=(ResultSetMetaData) rs.getMetaData();
+					System.out.print(rs1.getColumnName(1)+"  ");
+					System.out.print(rs1.getColumnName(2)+"  ");
+					System.out.print(rs1.getColumnName(3)+" ");
+					System.out.print(rs1.getColumnName(4)+" ");
+					System.out.println();
+					while(rs.next()){
+					System.out.println(rs.getInt(1)+"  "+rs.getString(2)+"   "+rs.getInt(3)+"  "+rs.getString(4));
+					}
+					System.out.println();
 					break;
 
 				default:
